@@ -4,26 +4,35 @@ import { removeCar } from "../store";
 
 function CarList() {
   const dispatch = useDispatch();
-  const cars = useSelector((state) => state.cars.data);
+  const { cars, name } = useSelector(({ form, cars: { searchTerm, data } }) => {
+    const filteredCars = data.filter((car) =>
+      car.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return {
+      cars: filteredCars,
+      name: form.name,
+    };
+  });
 
   const handleCarDelete = (id) => {
     dispatch(removeCar(id));
   };
 
   const renderedCars = cars.map((car) => {
+    const bold = name && car.name.toLowerCase().includes(name.toLowerCase());
+
     return (
-      <div>
-        <div key={car.id} className="panel">
-          <p>
-            {car.name} - ${car.cost}
-          </p>
-          <button
-            className="button is-danger"
-            onClick={() => handleCarDelete(car.id)}
-          >
-            Delete
-          </button>
-        </div>
+      <div key={car.id} className={`panel ${bold && "bold"}`}>
+        <p>
+          {car.name} - ${car.cost}
+        </p>
+        <button
+          className="button is-danger"
+          onClick={() => handleCarDelete(car.id)}
+        >
+          Delete
+        </button>
       </div>
     );
   });
